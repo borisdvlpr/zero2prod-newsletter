@@ -1,4 +1,6 @@
 use reqwest;
+use sqlx::{PgConnection, Connection};
+use zero2prod_newsletter::configuration::get_configuration;
 use std::net::TcpListener;
 
 fn spawn_app() -> String {
@@ -27,12 +29,18 @@ async fn health_check_works() {
 
 #[tokio::test]
 async fn subscribe_returns_a_200_for_valid_form() {
-    let address = spawn_app();
+    let app_address = spawn_app();
+    let configuration = get_configuration().expect("Failed to load configuration.");
+    let connection_string = configuration.database.connection_string();
+
+    // the connection trait must be in scope
+    // PgConnection::connect it is not an inherit method of the struct!
+    let connection = PgConnection::connect(&connection_string).await.expect("Failed to connect to Postgres.");
     let client = reqwest::Client::new();
 
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
     let response = client
-        .post(&format!("{}/subscriptions", &address))
+        .post(&format!("{}/subscriptions", &app_address))
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
