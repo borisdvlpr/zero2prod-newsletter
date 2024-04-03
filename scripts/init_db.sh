@@ -32,9 +32,11 @@ DB_PORT="${POSTGRES_PORT:=5432}"
 DB_HOST="${POSTGRES_HOST:=localhost}"
 
 # launch postgres using docker
+# SKIP_DOCKER=true skips the creation of the container, executes migrations only
 if [[ -z "${SKIP_DOCKER}" ]]
 then
     docker run \
+        --name postgres \
         -e POSTGRES_USER=${DB_USER} \
         -e POSTGRES_PASSWORD=${DB_PASSWORD} \
         -e POSTGRES_DB=${DB_NAME} \
