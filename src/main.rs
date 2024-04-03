@@ -1,4 +1,4 @@
-use zero2prod_newsletter::run;
+use zero2prod_newsletter::startup::run;
 
 use std::net::TcpListener;
 
