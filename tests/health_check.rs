@@ -5,20 +5,26 @@ use zero2prod_newsletter::configuration::get_configuration;
 
 pub struct TestApp {
     pub address: String,
-    pub db_pool: PgPool
+    pub db_pool: PgPool,
 }
 
 async fn spawn_app() -> TestApp {
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port.");
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
-    
+
     let configuration = get_configuration().expect("Failed to read configuration.");
-    let connection_pool = PgPool::connect(&configuration.database.connection_string()).await.expect("Failed to connect to Postgres.");
-    let server = zero2prod_newsletter::startup::run(listener, connection_pool.clone()).expect("Failed to bind address.");
+    let connection_pool = PgPool::connect(&configuration.database.connection_string())
+        .await
+        .expect("Failed to connect to Postgres.");
+    let server = zero2prod_newsletter::startup::run(listener, connection_pool.clone())
+        .expect("Failed to bind address.");
     let _ = tokio::spawn(server);
 
-    TestApp { address, db_pool: connection_pool }
+    TestApp {
+        address,
+        db_pool: connection_pool,
+    }
 }
 
 #[tokio::test]
