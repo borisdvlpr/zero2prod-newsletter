@@ -1,6 +1,8 @@
 use once_cell::sync::Lazy;
 use reqwest;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
+use std::env;
+use std::io;
 use std::net::TcpListener;
 use uuid::Uuid;
 use zero2prod_newsletter::configuration::{get_configuration, DatabaseSettings};
@@ -8,8 +10,18 @@ use zero2prod_newsletter::telemetry::{get_subscriber, init_subscriber};
 
 // Ensure that the 'tracing stack is only initialised once using 'once_cell'
 static TRACING: Lazy<()> = Lazy::new(|| {
-    let subscriber = get_subscriber("test".into(), "debug".into());
-    init_subscriber(subscriber);
+    let default_filter_level = "info".to_string();
+    let subscriber_name = "test".to_string();
+    
+    if env::var("TEST_LOG").is_ok() {
+        let subscriber = get_subscriber(subscriber_name, default_filter_level, io::stdout);
+        init_subscriber(subscriber);
+
+    } else {
+        let subscriber = get_subscriber(subscriber_name, default_filter_level, io::sink);
+        init_subscriber(subscriber);
+    }
+    
 });
 
 pub struct TestApp {
