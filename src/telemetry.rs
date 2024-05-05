@@ -6,7 +6,11 @@ use tracing_subscriber::{layer::SubscriberExt, EnvFilter, Registry};
 
 // use of 'Subscriber' type because the actual type of subscriber is more complex
 // need to implement Send + Sync to make it possible to pass it into 'init_subscriber'
-pub fn get_subscriber<Sink>(name: String, env_filter: String, sink: Sink) -> impl Subscriber + Send + Sync
+pub fn get_subscriber<Sink>(
+    name: String,
+    env_filter: String,
+    sink: Sink,
+) -> impl Subscriber + Send + Sync
 where
     // weird syntax -> means that Sink implements 'MakeWriter' for all choices of the lifetime parameter `'a`
     Sink: for<'a> MakeWriter<'a> + Send + Sync + 'static,
