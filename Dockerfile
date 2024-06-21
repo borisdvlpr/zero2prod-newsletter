@@ -2,7 +2,7 @@ FROM rust:alpine
 
 WORKDIR /app
 
-RUN apk update && apk add lld clang
+RUN apk update && apk add lld clang -y
 
 COPY . .
 
