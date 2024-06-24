@@ -71,14 +71,13 @@ impl TryFrom<String> for Environment {
                 "{} is not a supported environment. \
                 Use either `local` or `production`.",
                 other
-            ))
+            )),
         }
     }
 }
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
-    let base_path = std::env::current_dir()
-        .expect("Failed to determine current directory");
+    let base_path = std::env::current_dir().expect("Failed to determine current directory");
     let configuration_directory = base_path.join("config");
 
     // detect the running environment (default to 'local' if unspecified)
@@ -89,15 +88,15 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
         .expect("Failed to parse APP_ENVIRONMENT");
 
     let environment_filename = format!("{}.yaml", environment.as_str());
-    
+
     // initialize our configuration reader
     let settings = config::Config::builder()
-        .add_source(
-            config::File::from(configuration_directory.join("base.yaml"))
-        )
-        .add_source(
-            config::File::from(configuration_directory.join(environment_filename))
-        )
+        .add_source(config::File::from(
+            configuration_directory.join("base.yaml"),
+        ))
+        .add_source(config::File::from(
+            configuration_directory.join(environment_filename),
+        ))
         .build()?;
 
     // try to convert the configuration values it read into our settings type
