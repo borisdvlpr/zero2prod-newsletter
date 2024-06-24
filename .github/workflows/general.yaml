@@ -1,13 +1,13 @@
 name: Rust
-
-push:
-  branches:
-    - main
-
-  pull_request:
-    types: [ opened, synchronize, reopened ]
+on:
+  push:
     branches:
       - main
+
+    pull_request:
+      types: [ opened, synchronize, reopened ]
+      branches:
+        - main
 
 env:
   CARGO_TERM_COLOR: always
