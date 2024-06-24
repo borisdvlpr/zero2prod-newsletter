@@ -1,13 +1,30 @@
-FROM rust:alpine
+# build stage
+FROM rust:slim AS builder
 
 WORKDIR /app
 
-RUN apk update && apk add lld clang -y
+RUN apt update && apt install lld clang -y
 
 COPY . .
-
 ENV SQLX_OFFLINE true
-ENV APP_ENVIRONMENT production
 RUN cargo build --release
 
-ENTRYPOINT ["./target/release/zero2prod"]
+# runtime stage
+FROM debian:bookworm-slim AS runtime
+
+WORKDIR /app
+
+# install openssl - dynamically linked to some dependenices
+# install ca-certificates - needed to verify tls certificates for HTTPS
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends openssl ca-certificates \
+    # clean up
+    && apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app/target/release/zero2prod zero2prod
+COPY config config
+ENV APP_ENVIRONMENT production
+
+ENTRYPOINT ["./zero2prod"]
