@@ -147,7 +147,10 @@ async fn subscribe_returns_200_when_fields_are_present_but_empty() {
     let test_cases = vec![
         ("name=&email=ursula_le_guin%40gmail.com", "empty name"),
         ("name=Ursula&email=", "empty email"),
-        ("name=Ursula&email=definitely-not-a-valid-email", "invalid email"),
+        (
+            "name=Ursula&email=definitely-not-a-valid-email",
+            "invalid email",
+        ),
     ];
 
     for (invalid_body, error_message) in test_cases {
@@ -162,7 +165,8 @@ async fn subscribe_returns_200_when_fields_are_present_but_empty() {
         assert_eq!(
             200,
             response.status().as_u16(),
-            "The API did not return a 200 OK when the payload was {}", error_message
+            "The API did not return a 200 OK when the payload was {}",
+            error_message
         );
     }
 }
