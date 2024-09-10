@@ -7,13 +7,13 @@ pub struct NewSubscriber {
 
 pub struct SubscriberName(String);
 
-impl SubscriberName {
-    // the caller gets a shared reference to the inner string, giving it a **read-only**
-    // access, disabling it to compromise our invariants.
-    pub fn inner_ref(&self) -> &str {
+impl AsRef<str> for SubscriberName {
+    fn as_ref(&self) -> &str {
         &self.0
     }
+}
 
+impl SubscriberName {
     // returns an instance of 'SubscriberName' if the input satisfies all
     // our validation constraints on subscriber names. It panics otherwise.
     pub fn parse(s: String) -> SubscriberName {
@@ -37,3 +37,5 @@ impl SubscriberName {
         }
     }
 }
+
+
