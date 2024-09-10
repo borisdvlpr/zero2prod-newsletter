@@ -16,7 +16,7 @@ impl AsRef<str> for SubscriberName {
 impl SubscriberName {
     // returns an instance of 'SubscriberName' if the input satisfies all
     // our validation constraints on subscriber names. It panics otherwise.
-    pub fn parse(s: String) -> SubscriberName {
+    pub fn parse(s: String) -> Result<SubscriberName, String> {
         let is_empty_or_whitespace = s.trim().is_empty();
 
         // a graphmeme is defined by the unicode standard as a "user-perceived"
@@ -33,7 +33,7 @@ impl SubscriberName {
             panic!("{} is not a valid subscriber name.", s)
         
         } else {
-            Self(s)
+            Ok(Self(s))
         }
     }
 }
