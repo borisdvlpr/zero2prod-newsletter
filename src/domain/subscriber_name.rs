@@ -1,10 +1,5 @@
 use unicode_segmentation::UnicodeSegmentation;
 
-pub struct NewSubscriber {
-    pub email: String,
-    pub name: SubscriberName,
-}
-
 #[derive(Debug)]
 pub struct SubscriberName(String);
 
@@ -32,7 +27,6 @@ impl SubscriberName {
 
         if is_empty_or_whitespace || is_too_long || contains_forbidden_characters {
             Err(format!("{} is not a valid subscriber name.", s))
-        
         } else {
             Ok(Self(s))
         }
@@ -41,7 +35,7 @@ impl SubscriberName {
 
 #[cfg(test)]
 mod tests {
-    use crate::domain::SubscriberName;
+    use crate::domain::subscriber_name::SubscriberName;
     use claims::{assert_err, assert_ok};
 
     #[test]
