@@ -22,7 +22,11 @@ impl SubscriberEmail {
 #[cfg(test)]
 mod tests {
     use super::SubscriberEmail;
-    use claims::assert_err;
+    use claims::{assert_ok, assert_err};
+    // we are using the 'SafeEmail' faker, and we also need the 'Fake' trait
+    // to get access to the '.fake' method on 'SafeEmail'
+    use fake::faker::internet::en::SafeEmail;
+    use fake::Fake;
 
     #[test]
     fn empty_string_is_rejected() {
@@ -40,5 +44,11 @@ mod tests {
     fn email_missing_subject_is_rejected() {
         let email = "@domain.com".to_string();
         assert_err!(SubscriberEmail::parse(email));
+    }
+
+    #[test]
+    fn valid_emails_are_parsed_successfully() {
+        let email = SafeEmail().fake();
+        assert_ok!(SubscriberEmail::parse(email));
     }
 }
