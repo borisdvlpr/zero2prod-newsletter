@@ -57,7 +57,7 @@ mod tests {
     }
 
     #[test]
-    fn empty_string_is_regected() {
+    fn empty_string_is_rejected() {
         let name = "".to_string();
         assert_err!(SubscriberName::parse(name));
     }
