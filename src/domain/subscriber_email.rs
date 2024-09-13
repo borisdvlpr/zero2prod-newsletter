@@ -22,11 +22,22 @@ impl SubscriberEmail {
 #[cfg(test)]
 mod tests {
     use super::SubscriberEmail;
-    use claims::{assert_ok, assert_err};
+    use claims::assert_err;
     // we are using the 'SafeEmail' faker, and we also need the 'Fake' trait
     // to get access to the '.fake' method on 'SafeEmail'
     use fake::faker::internet::en::SafeEmail;
     use fake::Fake;
+    use quickcheck::{Arbitrary, Gen};
+
+    #[derive(Debug, Clone)]
+    struct ValidEmailFixture(pub String);
+
+    impl Arbitrary for ValidEmailFixture {
+        fn arbitrary(g: &mut Gen) -> Self {
+            let email = SafeEmail().fake_with_rng(g);
+            Self(email)
+        }
+    }
 
     #[test]
     fn empty_string_is_rejected() {
@@ -46,9 +57,8 @@ mod tests {
         assert_err!(SubscriberEmail::parse(email));
     }
 
-    #[test]
-    fn valid_emails_are_parsed_successfully() {
-        let email = SafeEmail().fake();
-        assert_ok!(SubscriberEmail::parse(email));
+    #[quickcheck_macros::quickcheck]
+    fn valid_emails_are_parsed_successfully(valid_email: ValidEmailFixture) -> bool {
+        SubscriberEmail::parse(valid_email.0).is_ok()
     }
 }
