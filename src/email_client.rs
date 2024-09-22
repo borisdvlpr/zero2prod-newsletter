@@ -1,5 +1,5 @@
-use reqwest::Client;
 use crate::domain::SubscriberEmail;
+use reqwest::Client;
 
 pub struct EmailClient {
     http_client: Client,
