@@ -6,6 +6,7 @@ use std::io;
 use std::net::TcpListener;
 use uuid::Uuid;
 use zero2prod_newsletter::configuration::{get_configuration, DatabaseSettings};
+use zero2prod_newsletter::email_client::EmailClient;
 use zero2prod_newsletter::telemetry::{get_subscriber, init_subscriber};
 
 // Ensure that the 'tracing stack is only initialised once using 'once_cell'
@@ -35,11 +36,19 @@ async fn spawn_app() -> TestApp {
     let address = format!("http://127.0.0.1:{}", port);
 
     let mut configuration = get_configuration().expect("Failed to read configuration.");
+
     configuration.database.database_name = Uuid::new_v4().to_string();
     let connection_pool = configure_database(&configuration.database).await;
 
-    let server = zero2prod_newsletter::startup::run(listener, connection_pool.clone())
-        .expect("Failed to bind address.");
+    let sender_email = configuration
+        .email_client
+        .sender()
+        .expect("Invalid sender email address");
+    let email_client = EmailClient::new(configuration.email_client.base_url, sender_email);
+
+    let server =
+        zero2prod_newsletter::startup::run(listener, connection_pool.clone(), email_client)
+            .expect("Failed to bind address.");
     let _ = tokio::spawn(server);
 
     TestApp {
