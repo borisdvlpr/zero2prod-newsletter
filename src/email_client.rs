@@ -18,7 +18,7 @@ impl EmailClient {
 
     pub async fn send_email(
         &self,
-        recipeint: SubscriberEmail,
+        recipient: SubscriberEmail,
         subject: &str,
         html_context: &str,
         text_content: &str
