@@ -4,7 +4,7 @@ use reqwest::Client;
 pub struct EmailClient {
     http_client: Client,
     base_url: String,
-    sender: SubscriberEmail
+    sender: SubscriberEmail,
 }
 
 impl EmailClient {
@@ -12,7 +12,7 @@ impl EmailClient {
         Self {
             http_client: Client::new(),
             base_url,
-            sender
+            sender,
         }
     }
 
@@ -21,7 +21,7 @@ impl EmailClient {
         recipient: SubscriberEmail,
         subject: &str,
         html_context: &str,
-        text_content: &str
+        text_content: &str,
     ) -> Result<(), String> {
         todo!();
     }
