@@ -1,5 +1,4 @@
 use crate::domain::SubscriberEmail;
-use config::ValueKind::String;
 use reqwest::Client;
 use secrecy::{ExposeSecret, Secret};
 use serde;
