@@ -1,5 +1,7 @@
 # rust
+/debug
 /target
+Cargo.lock
 
 # editor
 .vscode
