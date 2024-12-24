@@ -3,8 +3,29 @@
 /target
 Cargo.lock
 
+# go binaries for programs and plugins
+/dagger/*.exe
+/dagger/*.exe~
+/dagger/*.dll
+/dagger/*.so
+/dagger/*.dylib
+
+# go test binary, built with `go test -c`
+/dagger/*.test
+
+# go output of the go coverage tool, specifically when used with LiteIDE
+/dagger/*.out
+
+# dependency directories (remove the comment below to include it)
+# vendor/
+
+# go workspace file
+/dagger/go.work
+/dagger/go.work.sum
+
 # editor
 .vscode
+.idea/*
 
 # system
 .DS_Store
