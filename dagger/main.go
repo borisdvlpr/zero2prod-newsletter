@@ -73,6 +73,10 @@ func main() {
 	if err := Lint(ctx, baseImage); err != nil {
 		handleError(err)
 	}
+
+	if err := Test(ctx, baseImage); err != nil {
+		handleError(err)
+	}
 }
 
 // enforce format job
@@ -97,6 +101,20 @@ func Lint(ctx context.Context, baseImage *dagger.Container) error {
 		WithExec([]string{"cargo", "clippy", "--", "-D", "warnings"})
 
 	_, err := clippy.ExitCode(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// test job
+func Test(ctx context.Context, baseImage *dagger.Container) error {
+	test := baseImage.
+		WithExec([]string{"cargo", "sqlx", "prepare", "--workspace", "--check"}).
+		WithExec([]string{"cargo", "test"})
+
+	_, err := test.ExitCode(ctx)
 	if err != nil {
 		return err
 	}
