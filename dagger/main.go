@@ -69,6 +69,10 @@ func main() {
 	if err := Format(ctx, baseImage); err != nil {
 		handleError(err)
 	}
+
+	if err := Lint(ctx, baseImage); err != nil {
+		handleError(err)
+	}
 }
 
 // enforce format job
@@ -78,6 +82,21 @@ func Format(ctx context.Context, baseImage *dagger.Container) error {
 		WithExec([]string{"cargo", "fmt", "--check"})
 
 	_, err := format.ExitCode(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// linting job
+func Lint(ctx context.Context, baseImage *dagger.Container) error {
+	clippy := baseImage.
+		WithEnvVariable("SQLX_OFFLINE", "true").
+		WithExec([]string{"rustup", "component", "add", "clippy"}).
+		WithExec([]string{"cargo", "clippy", "--", "-D", "warnings"})
+
+	_, err := clippy.ExitCode(ctx)
 	if err != nil {
 		return err
 	}
