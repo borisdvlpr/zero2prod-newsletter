@@ -77,6 +77,10 @@ func main() {
 	if err := Test(ctx, baseImage); err != nil {
 		handleError(err)
 	}
+
+	if err := Coverage(ctx, baseImage); err != nil {
+		handleError(err)
+	}
 }
 
 // enforce format job
@@ -113,6 +117,20 @@ func Test(ctx context.Context, baseImage *dagger.Container) error {
 	test := baseImage.
 		WithExec([]string{"cargo", "sqlx", "prepare", "--workspace", "--check"}).
 		WithExec([]string{"cargo", "test"})
+
+	_, err := test.ExitCode(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// code coverage job
+func Coverage(ctx context.Context, baseImage *dagger.Container) error {
+	test := baseImage.
+		WithExec([]string{"cargo", "install", "cargo-llvm-cov", "--locked"}).
+		WithExec([]string{"cargo", "llvm-cov", "--all-features", "--workspace"})
 
 	_, err := test.ExitCode(ctx)
 	if err != nil {
