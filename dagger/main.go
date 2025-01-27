@@ -89,10 +89,12 @@ func Format(ctx context.Context, baseImage *dagger.Container) error {
 		WithExec([]string{"rustup", "component", "add", "rustfmt"}).
 		WithExec([]string{"cargo", "fmt", "--check"})
 
-	_, err := format.ExitCode(ctx)
+	out, err := format.Stdout(context.Background())
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(out)
 
 	return nil
 }
@@ -104,10 +106,12 @@ func Lint(ctx context.Context, baseImage *dagger.Container) error {
 		WithExec([]string{"rustup", "component", "add", "clippy"}).
 		WithExec([]string{"cargo", "clippy", "--", "-D", "warnings"})
 
-	_, err := clippy.ExitCode(ctx)
+	out, err := clippy.Stdout(context.Background())
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(out)
 
 	return nil
 }
@@ -118,24 +122,28 @@ func Test(ctx context.Context, baseImage *dagger.Container) error {
 		WithExec([]string{"cargo", "sqlx", "prepare", "--workspace", "--check"}).
 		WithExec([]string{"cargo", "test"})
 
-	_, err := test.ExitCode(ctx)
+	out, err := test.Stdout(context.Background())
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(out)
 
 	return nil
 }
 
 // code coverage job
 func Coverage(ctx context.Context, baseImage *dagger.Container) error {
-	test := baseImage.
+	coverage := baseImage.
 		WithExec([]string{"cargo", "install", "cargo-llvm-cov", "--locked"}).
 		WithExec([]string{"cargo", "llvm-cov", "--all-features", "--workspace"})
 
-	_, err := test.ExitCode(ctx)
+	out, err := coverage.Stdout(context.Background())
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(out)
 
 	return nil
 }
