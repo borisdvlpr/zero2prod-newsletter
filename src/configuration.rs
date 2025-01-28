@@ -72,6 +72,7 @@ impl EmailClientSettings {
 // possible runtime environment for our application
 pub enum Environment {
     Local,
+    Ci,
     Production,
 }
 
@@ -79,6 +80,7 @@ impl Environment {
     pub fn as_str(&self) -> &'static str {
         match self {
             Environment::Local => "local",
+            Environment::Ci => "ci",
             Environment::Production => "production",
         }
     }
@@ -91,6 +93,7 @@ impl TryFrom<String> for Environment {
     fn try_from(s: String) -> Result<Self, Self::Error> {
         match s.to_lowercase().as_str() {
             "local" => Ok(Self::Local),
+            "ci" => Ok(Self::Ci),
             "production" => Ok(Self::Production),
             other => Err(format!(
                 "{} is not a supported environment. \
