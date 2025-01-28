@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"dagger.io/dagger"
+	"dagger.io/dagger/dag"
 )
 
 const (
@@ -50,6 +51,7 @@ func main() {
 		WithServiceBinding(POSTGRES_HOST, postgres).
 		WithDirectory("/hello-rust", client.Host().Directory(".")).
 		WithWorkdir("/hello-rust").
+		WithMountedCache("/target", dag.CacheVolume("rust-target-001")).
 		WithEnvVariable("CARGO_TERM_COLOR", CARGO_TERM_COLOR).
 		WithEnvVariable("SQLX_VERSION", SQLX_VERSION).
 		WithEnvVariable("SQLX_FEATURES", SQLX_FEATURES).
@@ -89,7 +91,7 @@ func Format(ctx context.Context, baseImage *dagger.Container) error {
 		WithExec([]string{"rustup", "component", "add", "rustfmt"}).
 		WithExec([]string{"cargo", "fmt", "--check"})
 
-	out, err := format.Stdout(context.Background())
+	out, err := format.Stdout(ctx)
 	if err != nil {
 		return err
 	}
@@ -106,7 +108,7 @@ func Lint(ctx context.Context, baseImage *dagger.Container) error {
 		WithExec([]string{"rustup", "component", "add", "clippy"}).
 		WithExec([]string{"cargo", "clippy", "--", "-D", "warnings"})
 
-	out, err := clippy.Stdout(context.Background())
+	out, err := clippy.Stdout(ctx)
 	if err != nil {
 		return err
 	}
@@ -122,7 +124,7 @@ func Test(ctx context.Context, baseImage *dagger.Container) error {
 		WithExec([]string{"cargo", "sqlx", "prepare", "--workspace", "--check"}).
 		WithExec([]string{"cargo", "test"})
 
-	out, err := test.Stdout(context.Background())
+	out, err := test.Stdout(ctx)
 	if err != nil {
 		return err
 	}
@@ -138,7 +140,7 @@ func Coverage(ctx context.Context, baseImage *dagger.Container) error {
 		WithExec([]string{"cargo", "install", "cargo-llvm-cov", "--locked"}).
 		WithExec([]string{"cargo", "llvm-cov", "--all-features", "--workspace"})
 
-	out, err := coverage.Stdout(context.Background())
+	out, err := coverage.Stdout(ctx)
 	if err != nil {
 		return err
 	}
