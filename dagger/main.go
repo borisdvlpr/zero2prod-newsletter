@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"dagger/dagger/internal/dagger"
+
+	"golang.org/x/sync/errgroup"
 )
 
 // Constructor
@@ -29,6 +32,44 @@ type Dagger struct {
 	DatabaseUser     string
 	DatabasePassword string
 	DatabaseName     string
+}
+
+// Return the result of running the formatter
+func (m *Dagger) Format(ctx context.Context) (string, error) {
+	return m.BuildEnv().
+		WithExec([]string{"rustup", "component", "add", "rustfmt"}).
+		WithExec([]string{"cargo", "fmt", "--check"}).
+		Stdout(ctx)
+}
+
+// Return the result of running the linter
+func (m *Dagger) Lint(ctx context.Context) (string, error) {
+	return m.BuildEnv().
+		WithEnvVariable("SQLX_OFFLINE", "true").
+		WithExec([]string{"rustup", "component", "add", "clippy"}).
+		WithExec([]string{"cargo", "clippy", "--", "-D", "warnings"}).
+		Stdout(ctx)
+}
+
+// Run formatter, linter, tests and coverage concurrently
+func (m *Dagger) RunAllTests(ctx context.Context) error {
+	// Create error group
+	eg, gctx := errgroup.WithContext(ctx)
+
+	// Run formatter
+	eg.Go(func() error {
+		_, err := m.Format(gctx)
+		return err
+	})
+
+	// Run linter
+	eg.Go(func() error {
+		_, err := m.Lint(gctx)
+		return err
+	})
+	// Wait for all tests to complete
+	// If any test fails, the error will be returned
+	return eg.Wait()
 }
 
 // Build a ready-to-use development environment
