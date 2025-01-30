@@ -59,6 +59,14 @@ func (m *Dagger) Test(ctx context.Context) (string, error) {
 		Stdout(ctx)
 }
 
+// Return the result of running the linter
+func (m *Dagger) Coverage(ctx context.Context) (string, error) {
+	return m.BuildEnv().
+		WithExec([]string{"cargo", "install", "cargo-llvm-cov", "--locked"}).
+		WithExec([]string{"cargo", "llvm-cov", "--all-features", "--workspace"}).
+		Stdout(ctx)
+}
+
 // Run formatter, linter, tests and coverage concurrently
 func (m *Dagger) RunAllTests(ctx context.Context) error {
 	// Create error group
@@ -82,6 +90,11 @@ func (m *Dagger) RunAllTests(ctx context.Context) error {
 		return err
 	})
 
+	// Run coverage
+	eg.Go(func() error {
+		_, err := m.Coverage(gctx)
+		return err
+	})
 	// Wait for all tests to complete
 	// If any test fails, the error will be returned
 	return eg.Wait()
