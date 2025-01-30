@@ -51,6 +51,14 @@ func (m *Dagger) Lint(ctx context.Context) (string, error) {
 		Stdout(ctx)
 }
 
+// Return the result of running the tests
+func (m *Dagger) Test(ctx context.Context) (string, error) {
+	return m.BuildEnv().
+		WithExec([]string{"cargo", "sqlx", "prepare", "--workspace", "--check"}).
+		WithExec([]string{"cargo", "test"}).
+		Stdout(ctx)
+}
+
 // Run formatter, linter, tests and coverage concurrently
 func (m *Dagger) RunAllTests(ctx context.Context) error {
 	// Create error group
@@ -67,6 +75,13 @@ func (m *Dagger) RunAllTests(ctx context.Context) error {
 		_, err := m.Lint(gctx)
 		return err
 	})
+
+	// Run tests
+	eg.Go(func() error {
+		_, err := m.Test(gctx)
+		return err
+	})
+
 	// Wait for all tests to complete
 	// If any test fails, the error will be returned
 	return eg.Wait()
