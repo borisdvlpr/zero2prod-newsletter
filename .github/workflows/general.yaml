@@ -1,4 +1,4 @@
-name: Rust
+name: Dagger Pipeline
 on:
   push:
     branches:
@@ -11,23 +11,42 @@ on:
     workflow_dispatch:
 
 jobs:
-  dagger:
-    name: Dagger Pipeline
+  format:
+    name: Format
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Go Setup
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
+      - name: Run Dagger Format
+        uses: ./.github/actions/function-call
         with:
-          go-version: 1.23.4
-          cache: false
+          task: format
 
-      - name: Run Pipeline
-        uses: dagger/dagger-for-github@v6
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Dagger Lint
+        uses: ./.github/actions/function-call
         with:
-          version: "0.15.1"
-          workdir: .
-          verb: call
-          args: --source=. run-all-tests
+          task: lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Dagger Test
+        uses: ./.github/actions/function-call
+        with:
+          task: test
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Dagger Coverage
+        uses: ./.github/actions/function-call
+        with:
+          task: coverage
