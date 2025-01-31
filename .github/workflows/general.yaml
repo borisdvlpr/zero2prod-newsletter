@@ -11,42 +11,14 @@ on:
     workflow_dispatch:
 
 jobs:
-  format:
-    name: Format
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        task: [format, lint, test, coverage]
     steps:
       - uses: actions/checkout@v4
-      - name: Run Dagger Format
+      - name: Run Dagger ${{ matrix.task }}
         uses: ./.github/actions/function-call
         with:
-          task: format
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Dagger Lint
-        uses: ./.github/actions/function-call
-        with:
-          task: lint
-
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Dagger Test
-        uses: ./.github/actions/function-call
-        with:
-          task: test
-
-  coverage:
-    name: Coverage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Dagger Coverage
-        uses: ./.github/actions/function-call
-        with:
-          task: coverage
+          task: ${{ matrix.task }}
