@@ -1,6 +1,5 @@
 use once_cell::sync::Lazy;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
-use std::fmt::format;
 use std::{env, io};
 use uuid::Uuid;
 use zero2prod_newsletter::configuration::{get_configuration, DatabaseSettings};
