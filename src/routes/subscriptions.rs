@@ -61,7 +61,10 @@ pub async fn subscribe(
     name = "Send a confirmation email to a new subscriber",
     skip(email_client, new_subscriber)
 )]
-pub async fn send_confirmation_email(email_client: &EmailClient, new_subscriber: NewSubscriber) -> Result<(), reqwest::Error> {
+pub async fn send_confirmation_email(
+    email_client: &EmailClient,
+    new_subscriber: NewSubscriber,
+) -> Result<(), reqwest::Error> {
     let confirmation_link = "https://there-is-no-such-domain.com/subscriptions/confirm";
     let html_body = &format!(
         "Welcome to our newsletter!<br />\
@@ -74,12 +77,7 @@ pub async fn send_confirmation_email(email_client: &EmailClient, new_subscriber:
     );
 
     email_client
-        .send_email(
-            new_subscriber.email,
-            "Welcome!",
-            &html_body,
-            &plain_body,
-        )
+        .send_email(new_subscriber.email, "Welcome!", &html_body, &plain_body)
         .await
 }
 
