@@ -43,10 +43,13 @@ async fn the_link_returned_by_subscribe_returns_a_200_if_called() {
     };
 
     let raw_confimation_link = &get_link(&body["HtmlBody"].as_str().unwrap());
-    let confirmation_link = Url::parse(raw_confimation_link).unwrap();
+    let mut confirmation_link = Url::parse(raw_confimation_link).unwrap();
 
     // ensure that there are no calls to random api's
     assert_eq!(confirmation_link.host_str().unwrap(), "127.0.0.1");
+
+    // rewrite the URL to include the port
+    confirmation_link.set_port(Some(app.port)).unwrap();
 
     let response = reqwest::get(confirmation_link).await.unwrap();
     assert_eq!(response.status().as_u16(), 200);
