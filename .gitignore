@@ -24,8 +24,8 @@ Cargo.lock
 /dagger/go.work.sum
 
 # editor
-.vscode
 .idea/*
+.zed
 
 # system
 .DS_Store
