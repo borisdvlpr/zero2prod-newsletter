@@ -1,4 +1,3 @@
-use reqwest::Url;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, ResponseTemplate};
 
@@ -29,28 +28,9 @@ async fn the_link_returned_by_subscribe_returns_a_200_if_called() {
     app.post_subscription(body.into()).await;
 
     let email_request = &app.email_server.received_requests().await.unwrap()[0];
-    let body: serde_json::Value = serde_json::from_slice(&email_request.body).unwrap();
+    let confirmation_links = app.get_confirmation_links(&email_request);
 
-    let get_link = |s: &str| {
-        let links: Vec<_> = linkify::LinkFinder::new()
-            .links(s)
-            .filter(|l| *l.kind() == linkify::LinkKind::Url)
-            .collect();
+    let response = reqwest::get(confirmation_links.html).await.unwrap();
 
-        assert_eq!(links.len(), 1);
-
-        links[0].as_str().to_owned()
-    };
-
-    let raw_confimation_link = &get_link(&body["HtmlBody"].as_str().unwrap());
-    let mut confirmation_link = Url::parse(raw_confimation_link).unwrap();
-
-    // ensure that there are no calls to random api's
-    assert_eq!(confirmation_link.host_str().unwrap(), "127.0.0.1");
-
-    // rewrite the URL to include the port
-    confirmation_link.set_port(Some(app.port)).unwrap();
-
-    let response = reqwest::get(confirmation_link).await.unwrap();
     assert_eq!(response.status().as_u16(), 200);
 }
