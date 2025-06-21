@@ -4,15 +4,12 @@ use rand::distributions::Alphanumeric;
 use rand::thread_rng;
 use rand::Rng;
 use sqlx::PgPool;
-use tracing::subscriber;
 use uuid::Uuid;
 
 use crate::domain::NewSubscriber;
 use crate::domain::SubscriberEmail;
 use crate::domain::SubscriberName;
 use crate::email_client::EmailClient;
-use crate::routes::subscriptions;
-use crate::routes::subscriptions_confirm;
 use crate::startup::ApplicationBaseUrl;
 
 #[derive(serde::Deserialize)]
@@ -150,7 +147,7 @@ pub async fn store_token(
 ) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
-        INSERT INTO subscription_tokens (subscription_token, subscriber_id)
+        INSERT INTO subscriptions_tokens (subscription_token, subscriber_id)
         VALUES ($1, $2)
         "#,
         subscription_token,
