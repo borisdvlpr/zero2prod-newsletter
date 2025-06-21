@@ -7,6 +7,7 @@ use crate::domain::NewSubscriber;
 use crate::domain::SubscriberEmail;
 use crate::domain::SubscriberName;
 use crate::email_client::EmailClient;
+use crate::routes::subscriptions;
 use crate::startup::ApplicationBaseUrl;
 
 #[derive(serde::Deserialize)]
@@ -49,7 +50,7 @@ pub async fn subscribe(
         return HttpResponse::InternalServerError().finish();
     }
 
-    if send_confirmation_email(&email_client, new_subscriber, &base_url.0)
+    if send_confirmation_email(&email_client, new_subscriber, &base_url.0, "mytoken")
         .await
         .is_err()
     {
@@ -67,10 +68,11 @@ pub async fn send_confirmation_email(
     email_client: &EmailClient,
     new_subscriber: NewSubscriber,
     base_url: &str,
+    subscription_token: &str,
 ) -> Result<(), reqwest::Error> {
     let confirmation_link = format!(
-        "{}/subscriptions/confirm?subscription_token=mytoken",
-        base_url
+        "{}/subscriptions/confirm?subscription_token={}",
+        base_url, subscription_token
     );
 
     let html_body = format!(
