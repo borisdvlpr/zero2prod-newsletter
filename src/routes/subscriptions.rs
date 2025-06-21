@@ -1,5 +1,8 @@
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
+use rand::distributions::Alphanumeric;
+use rand::thread_rng;
+use rand::Rng;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -117,4 +120,12 @@ pub async fn insert_subscriber(
     })?;
 
     Ok(())
+}
+
+fn generate_subscription_token() -> String {
+    let mut rng = thread_rng();
+    std::iter::repeat_with(|| rng.sample(Alphanumeric))
+        .map(char::from)
+        .take(25)
+        .collect()
 }
