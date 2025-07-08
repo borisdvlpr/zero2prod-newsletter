@@ -25,7 +25,7 @@ Cargo.lock
 
 # editor
 .idea/*
-.zed
+.vscode
 
 # system
 .DS_Store
