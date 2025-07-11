@@ -86,7 +86,7 @@ pub enum SubscribeError {
 impl std::fmt::Display for SubscribeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SubscribeError::ValidationError(e) => write!(f, "{}", e),
+            SubscribeError::ValidationError(e) => write!(f, "{e}"),
             SubscribeError::StoreTokenError(_) => write!(
                 f,
                 "Failed to store the confirmation token for a new subscriber."
@@ -269,11 +269,11 @@ fn error_chain_fmt(
     e: &impl std::error::Error,
     f: &mut std::fmt::Formatter<'_>,
 ) -> std::fmt::Result {
-    writeln!(f, "{}\n", e)?;
+    writeln!(f, "{e}\n")?;
 
     let mut current = e.source();
     while let Some(cause) = current {
-        writeln!(f, "Caused by:\n\t{}", cause)?;
+        writeln!(f, "Caused by:\n\t{cause}")?;
         current = cause.source()
     }
 
