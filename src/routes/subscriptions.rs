@@ -5,7 +5,6 @@ use rand::distributions::Alphanumeric;
 use rand::thread_rng;
 use rand::Rng;
 use sqlx::{Executor, PgPool, Postgres, Transaction};
-use std::fmt::Formatter;
 use uuid::Uuid;
 
 use crate::domain::NewSubscriber;
